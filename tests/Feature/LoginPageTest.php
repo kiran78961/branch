@@ -13,6 +13,7 @@ class LoginPageTest extends TestCase
         $response->assertOk()
             ->assertSee('Sign in to Branch')
             ->assertSee('Work email')
-            ->assertSee('Password');
+            ->assertSee('Password')
+            ->assertSee('href="' . route('register') . '"', false);
     }
 }

@@ -103,7 +103,7 @@
                 </div>
 
                 <p class="mt-8 text-center text-sm text-[#748178]">
-                    New to Branch? <a href="#" class="font-semibold text-[#527863] transition hover:text-[#294b3b]">Talk to your team admin</a>
+                    New to Branch? <a href="{{ route('register') }}" class="font-semibold text-[#527863] transition hover:text-[#294b3b]">Create an account</a>
                 </p>
 
                 <p class="mt-12 text-center text-xs leading-5 text-[#98a199]">
