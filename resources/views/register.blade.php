@@ -62,48 +62,60 @@
                 <div class="mb-7">
                     <p class="mb-3 text-sm font-medium text-[#748178]">Your next chapter starts here</p>
                     <h2 id="register-title" class="text-3xl font-semibold tracking-[-0.035em] text-[#18221e] sm:text-[2.1rem]">Create your account</h2>
-                    <p class="mt-3 text-sm leading-6 text-[#748178]">A few details and you’ll be ready to grow together.</p>
+                    <p class="mt-3 text-sm leading-6 text-[#748178]">A few details and you’ll be ready to grow together. We’ll send you an email to verify your address.</p>
                 </div>
 
-                <div class="space-y-4" role="group" aria-label="Create an account">
+                <form method="POST" action="{{ route('register.store') }}" class="space-y-4">
+                    @csrf
+
+                    @if ($errors->any())
+                        <div role="alert" class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                            <ul class="list-inside list-disc space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div class="space-y-2">
                             <label for="first_name" class="block text-sm font-medium text-[#303c35]">First name</label>
-                            <input id="first_name" name="first_name" type="text" autocomplete="given-name" placeholder="Alex" class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
+                            <input id="first_name" name="first_name" type="text" value="{{ old('first_name') }}" autocomplete="given-name" placeholder="Alex" maxlength="120" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
                         </div>
                         <div class="space-y-2">
                             <label for="last_name" class="block text-sm font-medium text-[#303c35]">Last name</label>
-                            <input id="last_name" name="last_name" type="text" autocomplete="family-name" placeholder="Morgan" class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
+                            <input id="last_name" name="last_name" type="text" value="{{ old('last_name') }}" autocomplete="family-name" placeholder="Morgan" maxlength="120" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
                         </div>
                     </div>
 
                     <div class="space-y-2">
                         <label for="email" class="block text-sm font-medium text-[#303c35]">Work email</label>
-                        <input id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com" class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" placeholder="you@company.com" maxlength="255" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
                     </div>
 
                     <div class="space-y-2">
                         <label for="password" class="block text-sm font-medium text-[#303c35]">Password</label>
-                        <input id="password" name="password" type="password" autocomplete="new-password" placeholder="Create a password" class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
+                        <input id="password" name="password" type="password" autocomplete="new-password" placeholder="Create a password" minlength="8" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
                     </div>
 
                     <div class="space-y-2">
                         <label for="password_confirmation" class="block text-sm font-medium text-[#303c35]">Confirm password</label>
-                        <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" placeholder="Enter your password again" class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
+                        <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" placeholder="Enter your password again" minlength="8" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
                     </div>
 
                     <label class="flex cursor-pointer items-start gap-3 py-1 text-sm leading-5 text-[#58645c]">
-                        <input type="checkbox" name="terms" class="mt-0.5 size-4 shrink-0 rounded border-[#cbd4cc] accent-[#315d48] focus:ring-[#527863]/20">
+                        <input type="checkbox" name="terms" value="1" @checked(old('terms')) required class="mt-0.5 size-4 shrink-0 rounded border-[#cbd4cc] accent-[#315d48] focus:ring-[#527863]/20">
                         <span>I agree to Branch’s <a href="#" class="font-medium text-[#527863] underline decoration-[#c4ccc5] underline-offset-2 transition hover:text-[#294b3b]">Terms of Service</a> and <a href="#" class="font-medium text-[#527863] underline decoration-[#c4ccc5] underline-offset-2 transition hover:text-[#294b3b]">Privacy Policy</a>.</span>
                     </label>
 
-                    <button type="button" class="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#244b3b] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#193d30] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">
+                    <button type="submit" class="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#244b3b] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#193d30] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">
                         Create account
                         <svg class="size-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                             <path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
-                </div>
+                </form>
 
                 <p class="mt-7 text-center text-sm text-[#748178]">
                     Already have an account? <a href="{{ route('login') }}" class="font-semibold text-[#527863] transition hover:text-[#294b3b]">Sign in</a>

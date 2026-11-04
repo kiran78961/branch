@@ -75,6 +75,12 @@
                     <p class="mt-3 text-sm leading-6 text-[#748178]">Enter your details to pick up where you left off.</p>
                 </div>
 
+                @if (session('status'))
+                    <div role="status" class="mb-6 rounded-lg border border-[#cbdccf] bg-[#edf5ee] p-4 text-sm text-[#244b3b]">
+                        {{ session('status') }}
+                    </div>
+                @endif
+
                 <div class="space-y-5" role="group" aria-label="Sign in">
                     <div class="space-y-2">
                         <label for="email" class="block text-sm font-medium text-[#303c35]">Work email</label>
