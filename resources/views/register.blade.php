@@ -62,7 +62,7 @@
                 <div class="mb-7">
                     <p class="mb-3 text-sm font-medium text-[#748178]">Your next chapter starts here</p>
                     <h2 id="register-title" class="text-3xl font-semibold tracking-[-0.035em] text-[#18221e] sm:text-[2.1rem]">Create your account</h2>
-                    <p class="mt-3 text-sm leading-6 text-[#748178]">A few details and you’ll be ready to grow together. We’ll send you an email to verify your address.</p>
+                    <p class="mt-3 text-sm leading-6 text-[#748178]">A few details and you’ll be ready to grow together.</p>
                 </div>
 
                 <form method="POST" action="{{ route('register.store') }}" class="space-y-4">

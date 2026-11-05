@@ -42,4 +42,12 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    public function administrator(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            $user->is_admin = true;
+            $user->save();
+        });
+    }
 }

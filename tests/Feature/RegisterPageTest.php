@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -40,20 +39,22 @@ class RegisterPageTest extends TestCase
             'password' => 'a-strong-password',
             'password_confirmation' => 'a-strong-password',
             'terms' => '1',
+            'is_admin' => '1',
         ]);
 
-        $response->assertRedirect(route('verification.notice'));
+        $response->assertRedirect(route('attendance.index'));
 
         $this->assertDatabaseHas('users', [
             'name' => 'Alex Morgan',
             'email' => 'alex@example.com',
             'email_verified_at' => null,
+            'is_admin' => false,
         ]);
 
         $user = User::query()->where('email', 'alex@example.com')->firstOrFail();
         $this->assertTrue(Hash::check('a-strong-password', $user->password));
         $this->assertAuthenticatedAs($user);
-        Notification::assertSentTo($user, VerifyEmail::class);
+        Notification::assertNothingSent();
     }
 
     public function test_registration_does_not_store_user_when_terms_are_not_accepted(): void

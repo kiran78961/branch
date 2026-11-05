@@ -81,32 +81,44 @@
                     </div>
                 @endif
 
-                <div class="space-y-5" role="group" aria-label="Sign in">
+                <form method="POST" action="{{ route('login.store') }}" class="space-y-5">
+                    @csrf
+
+                    @if ($errors->any())
+                        <div role="alert" class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                            <ul class="list-inside list-disc space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <div class="space-y-2">
                         <label for="email" class="block text-sm font-medium text-[#303c35]">Work email</label>
-                        <input id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com" class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" placeholder="you@company.com" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
                     </div>
 
                     <div class="space-y-2">
                         <div class="flex items-center justify-between gap-4">
                             <label for="password" class="block text-sm font-medium text-[#303c35]">Password</label>
-                            <a href="#" class="text-sm font-medium text-[#527863] transition hover:text-[#294b3b]">Forgot password?</a>
+                            <span class="text-sm text-[#98a199]">Forgot password? Contact your administrator.</span>
                         </div>
-                        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
+                        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
                     </div>
 
                     <label class="flex w-fit cursor-pointer items-center gap-3 py-1 text-sm text-[#58645c]">
-                        <input type="checkbox" name="remember" class="size-4 rounded border-[#cbd4cc] accent-[#315d48] focus:ring-[#527863]/20">
+                        <input type="checkbox" name="remember" value="1" class="size-4 rounded border-[#cbd4cc] accent-[#315d48] focus:ring-[#527863]/20">
                         Keep me signed in
                     </label>
 
-                    <button type="button" class="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#244b3b] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#193d30] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">
+                    <button type="submit" class="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#244b3b] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#193d30] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">
                         Sign in
                         <svg class="size-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                             <path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
-                </div>
+                </form>
 
                 <p class="mt-8 text-center text-sm text-[#748178]">
                     New to Branch? <a href="{{ route('register') }}" class="font-semibold text-[#527863] transition hover:text-[#294b3b]">Create an account</a>
