@@ -30,8 +30,58 @@
     }
 }
 
+@keyframes branch-card-enter {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .branch-art-float {
     animation: branch-art-float 4s ease-in-out infinite;
+}
+
+.branch-card-enter {
+    animation: branch-card-enter 450ms ease-out both;
+}
+
+.branch-card-enter--delayed {
+    animation-delay: 120ms;
+}
+
+.branch-card-hover {
+    transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.branch-card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgb(23 59 50 / 10%);
+}
+
+[data-attendance-summary-card] {
+    transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.dark [data-attendance-summary-card] {
+    background-image: none;
+    background-color: #1c2924;
+}
+
+.dark [data-report-summary-card] {
+    border-color: #e4e9e3;
+}
+
+.dark [data-report-summary-card] [class~="text-[#18221e]"] {
+    color: #18221e;
+}
+
+.dark [data-report-summary-card] [class~="text-[#748178]"] {
+    color: #58645c;
 }
 
 .branch-art-leaf {
@@ -47,8 +97,18 @@
 
 @media (prefers-reduced-motion: reduce) {
     .branch-art-float,
-    .branch-art-leaf {
+    .branch-art-leaf,
+    .branch-card-enter {
         animation: none;
+    }
+
+    .branch-card-hover {
+        transition: none;
+    }
+
+    .branch-card-hover:hover {
+        transform: none;
+        box-shadow: none;
     }
 }
 

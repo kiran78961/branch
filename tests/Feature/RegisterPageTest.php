@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class RegisterPageTest extends TestCase
@@ -47,7 +48,6 @@ class RegisterPageTest extends TestCase
         $this->assertDatabaseHas('users', [
             'name' => 'Alex Morgan',
             'email' => 'alex@example.com',
-            'email_verified_at' => null,
             'is_admin' => false,
         ]);
 
@@ -55,6 +55,11 @@ class RegisterPageTest extends TestCase
         $this->assertTrue(Hash::check('a-strong-password', $user->password));
         $this->assertAuthenticatedAs($user);
         Notification::assertNothingSent();
+    }
+
+    public function test_users_table_does_not_have_email_verification_timestamp(): void
+    {
+        $this->assertFalse(Schema::hasColumn('users', 'email_verified_at'));
     }
 
     public function test_registration_does_not_store_user_when_terms_are_not_accepted(): void

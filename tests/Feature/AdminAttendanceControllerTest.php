@@ -35,6 +35,9 @@ class AdminAttendanceControllerTest extends TestCase
         $employee = User::factory()->create();
         Attendance::factory()->for($employee)->create([
             'attendance_date' => '2026-11-04',
+            'work_location' => 'wfh',
+            'is_late' => true,
+            'check_in_at' => '2026-11-04 09:00:00',
         ]);
         Attendance::factory()->for($employee)->create([
             'attendance_date' => '2026-11-05',
@@ -44,9 +47,17 @@ class AdminAttendanceControllerTest extends TestCase
             ->get(route('admin.attendance.index', ['date' => '2026-11-04']));
 
         $response->assertOk()
+            ->assertSee('Work location')
+            ->assertSee('WFH')
+            ->assertSee('2:30 PM')
+            ->assertSee('Employee arrived late')
+            ->assertSee('>Late</span>', false)
+            ->assertSee('Daily attendance')
+            ->assertViewHas('summary', fn (array $summary): bool => $summary['late'] === 1)
             ->assertViewHas('reportDate', '2026-11-04')
-            ->assertViewHas('staff', function ($staff): bool {
-                $employee = $staff->getCollection()->first(
+            ->assertViewHas('reportType', 'daily')
+            ->assertViewHas('reportRows', function ($reportRows): bool {
+                $employee = $reportRows->getCollection()->first(
                     fn (User $user): bool => ! $user->is_admin,
                 );
 
@@ -54,6 +65,130 @@ class AdminAttendanceControllerTest extends TestCase
                     && $employee->attendances->count() === 1
                     && $employee->attendances->first()->attendance_date->toDateString() === '2026-11-04';
             });
+    }
+
+    public function test_admin_weekly_report_covers_monday_through_sunday(): void
+    {
+        $admin = User::factory()->administrator()->create();
+        $employee = User::factory()->create(['name' => 'Weekly employee']);
+        Attendance::factory()->for($employee)->create([
+            'attendance_date' => '2026-11-02',
+            'work_location' => 'office',
+        ]);
+        Attendance::factory()->for($employee)->create([
+            'attendance_date' => '2026-11-04',
+            'work_location' => 'wfh',
+            'is_late' => true,
+        ]);
+        Attendance::factory()->for($employee)->create([
+            'attendance_date' => '2026-11-09',
+            'work_location' => 'office',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.attendance.index', ['report' => 'weekly', 'date' => '2026-11-04']))
+            ->assertOk()
+            ->assertViewHas('rangeStart', '2026-11-02')
+            ->assertViewHas('rangeEnd', '2026-11-08')
+            ->assertViewHas('summary', fn (array $summary): bool => $summary['office'] === 1
+                && $summary['wfh'] === 1
+                && $summary['late'] === 1
+                && $summary['absent'] === 8)
+            ->assertViewHas('reportRows', function ($reportRows) use ($employee): bool {
+                $weeklyEmployee = $reportRows->getCollection()->first(
+                    fn (User $user): bool => $user->is($employee),
+                );
+
+                return $weeklyEmployee !== null
+                    && $weeklyEmployee->report_office_days === 1
+                    && $weeklyEmployee->report_wfh_days === 1
+                    && $weeklyEmployee->report_late_days === 1
+                    && $weeklyEmployee->report_absent_days === 3;
+            });
+    }
+
+    public function test_admin_monthly_report_covers_the_calendar_month(): void
+    {
+        $admin = User::factory()->administrator()->create();
+        $employee = User::factory()->create(['name' => 'Monthly employee']);
+        Attendance::factory()->for($employee)->create([
+            'attendance_date' => '2026-10-30',
+        ]);
+        Attendance::factory()->for($employee)->create([
+            'attendance_date' => '2026-11-02',
+            'is_late' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.attendance.index', ['report' => 'monthly', 'date' => '2026-11-06']))
+            ->assertOk()
+            ->assertSee('November 2026')
+            ->assertViewHas('rangeStart', '2026-11-01')
+            ->assertViewHas('rangeEnd', '2026-11-30')
+            ->assertViewHas('summary', fn (array $summary): bool => $summary['office'] === 1
+                && $summary['late'] === 1
+                && $summary['absent'] === 39)
+            ->assertViewHas('reportRows', function ($reportRows) use ($employee): bool {
+                $monthlyEmployee = $reportRows->getCollection()->first(
+                    fn (User $user): bool => $user->is($employee),
+                );
+
+                return $monthlyEmployee !== null
+                    && $monthlyEmployee->report_office_days === 1
+                    && $monthlyEmployee->report_late_days === 1
+                    && $monthlyEmployee->report_absent_days === 19;
+            });
+    }
+
+    public function test_admin_absent_report_excludes_approved_leave_weekends_and_holidays(): void
+    {
+        $admin = User::factory()->administrator()->create();
+        $absentEmployee = User::factory()->create(['name' => 'Absent employee']);
+        $leaveEmployee = User::factory()->create(['name' => 'Leave employee']);
+        $leaveRequest = $leaveEmployee->leaveRequests()->create([
+            'leave_type' => 'annual',
+            'start_date' => '2026-11-06',
+            'end_date' => '2026-11-06',
+            'reason' => 'Approved leave',
+        ]);
+        $leaveRequest->status = 'approved';
+        $leaveRequest->save();
+
+        $this->actingAs($admin)
+            ->get(route('admin.attendance.index', ['report' => 'absent', 'date' => '2026-11-06']))
+            ->assertOk()
+            ->assertSee('Absent employees')
+            ->assertViewHas('rangeStart', '2026-11-01')
+            ->assertViewHas('rangeEnd', '2026-11-30')
+            ->assertViewHas('reportRows', function ($reportRows) use ($absentEmployee, $leaveEmployee): bool {
+                $rows = $reportRows->getCollection();
+                $absentEmployeeWasReportedOnWorkingDay = $rows->contains(
+                    fn (array $row): bool => $row['staffMember']->is($absentEmployee)
+                        && $row['date'] === '2026-11-06',
+                );
+                $leaveEmployeeWasReportedOnApprovedLeave = $rows->contains(
+                    fn (array $row): bool => $row['staffMember']->is($leaveEmployee)
+                        && $row['date'] === '2026-11-06',
+                );
+                $nonWorkingDateWasReported = $rows->contains(
+                    fn (array $row): bool => in_array($row['date'], ['2026-11-08', '2026-11-24'], true),
+                );
+
+                return $absentEmployeeWasReportedOnWorkingDay
+                    && ! $leaveEmployeeWasReportedOnApprovedLeave
+                    && ! $nonWorkingDateWasReported;
+            });
+    }
+
+    public function test_admin_attendance_report_rejects_an_unknown_report_type(): void
+    {
+        $admin = User::factory()->administrator()->create();
+
+        $this->actingAs($admin)
+            ->from(route('admin.attendance.index'))
+            ->get(route('admin.attendance.index', ['report' => 'yearly']))
+            ->assertRedirect(route('admin.attendance.index'))
+            ->assertSessionHasErrors('report');
     }
 
     public function test_unverified_accounts_are_included_in_staff_attendance_reports(): void
@@ -66,9 +201,9 @@ class AdminAttendanceControllerTest extends TestCase
             ->get(route('admin.attendance.index'))
             ->assertOk()
             ->assertViewHas('staffCount', 3)
-            ->assertViewHas('staff', function ($staff) use ($employee): bool {
-                return $staff->getCollection()->pluck('id')->contains($employee->id)
-                    && $staff->getCollection()->count() === 3;
+            ->assertViewHas('reportRows', function ($reportRows) use ($employee): bool {
+                return $reportRows->getCollection()->pluck('id')->contains($employee->id)
+                    && $reportRows->getCollection()->count() === 3;
             });
     }
 
@@ -109,7 +244,8 @@ class AdminAttendanceControllerTest extends TestCase
             ->assertSee('<aside', false)
             ->assertSee('Administration')
             ->assertSee('Attendance history')
-            ->assertSee('data-theme-toggle', false)
+            ->assertDontSee('Sign out')
+            ->assertDontSee('data-theme-toggle', false)
             ->assertSee('&lt;script&gt;alert(1)&lt;/script&gt;', false)
             ->assertDontSee('<script>alert(1)</script>', false);
     }

@@ -46,6 +46,22 @@
                     <span class="grid size-5 place-items-center" aria-hidden="true">▤</span>
                     Attendance history
                 </a>
+                <a href="{{ route('holidays.index') }}" @class([
+                    'inline-flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium transition',
+                    'bg-[#edf5ee] text-[#315d48]' => request()->routeIs('holidays.*'),
+                    'text-[#58645c] hover:bg-[#f7f8f5] hover:text-[#294b3b]' => ! request()->routeIs('holidays.*'),
+                ]) @if (request()->routeIs('holidays.*')) aria-current="page" @endif>
+                    <span class="grid size-5 place-items-center" aria-hidden="true">▦</span>
+                    Holidays
+                </a>
+                <a href="{{ route('settings.edit') }}" @class([
+                    'inline-flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium transition',
+                    'bg-[#edf5ee] text-[#315d48]' => request()->routeIs('settings.*'),
+                    'text-[#58645c] hover:bg-[#f7f8f5] hover:text-[#294b3b]' => ! request()->routeIs('settings.*'),
+                ]) @if (request()->routeIs('settings.*')) aria-current="page" @endif>
+                    <span class="grid size-5 place-items-center" aria-hidden="true">⚙</span>
+                    Settings
+                </a>
                 @if (! auth()->user()->is_admin)
                     <a href="{{ route('leave-requests.index') }}" @class([
                         'inline-flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium transition',
@@ -98,16 +114,6 @@
                     <p class="truncate text-sm font-semibold text-[#303c35]">{{ auth()->user()->name }}</p>
                     <p class="truncate text-xs text-[#748178]">{{ auth()->user()->email }}</p>
                 </div>
-                <button type="button" data-theme-toggle aria-pressed="false" aria-label="Toggle dark mode" class="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#dce2dc] px-3 text-sm font-medium text-[#303c35] transition hover:border-[#aab8ac] hover:bg-[#f7f8f5] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">
-                    <span aria-hidden="true" data-theme-icon>☾</span>
-                    <span data-theme-label>Dark mode</span>
-                </button>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="rounded-lg border border-[#dce2dc] px-3 py-2 text-sm font-medium text-[#303c35] transition hover:border-[#aab8ac] hover:bg-[#f7f8f5]">
-                        Sign out
-                    </button>
-                </form>
             </div>
         </aside>
 

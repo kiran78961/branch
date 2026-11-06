@@ -3,9 +3,11 @@
 use App\Http\Controllers\AdminAttendanceController;
 use App\Http\Controllers\AdminLeaveRequestController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -39,14 +41,30 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
+    Route::get('/settings', [SettingsController::class, 'edit'])
+        ->name('settings.edit');
+    Route::patch('/settings/profile', [SettingsController::class, 'updateProfile'])
+        ->name('settings.profile.update');
+    Route::patch('/settings/attendance', [SettingsController::class, 'updateAttendancePreferences'])
+        ->name('settings.attendance.update');
+    Route::patch('/settings/company-attendance', [SettingsController::class, 'updateCompanyAttendancePreferences'])
+        ->middleware('can:manage-attendance')
+        ->name('settings.company-attendance.update');
+
     Route::get('/attendance', [AttendanceController::class, 'index'])
         ->name('attendance.index');
     Route::get('/attendance/history', [AttendanceController::class, 'history'])
         ->name('attendance.history');
+    Route::get('/holidays', [HolidayController::class, 'index'])
+        ->name('holidays.index');
     Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn'])
         ->name('attendance.check-in');
     Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut'])
         ->name('attendance.check-out');
+    Route::post('/attendance/lunch/start', [AttendanceController::class, 'startLunch'])
+        ->name('attendance.lunch.start');
+    Route::post('/attendance/lunch/end', [AttendanceController::class, 'endLunch'])
+        ->name('attendance.lunch.end');
     Route::middleware('can:apply-leave')->group(function () {
         Route::get('/leave-requests', [LeaveRequestController::class, 'index'])
             ->name('leave-requests.index');

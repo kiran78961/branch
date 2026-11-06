@@ -15,16 +15,23 @@ class Attendance extends Model
     protected $fillable = [
         'user_id',
         'attendance_date',
+        'work_location',
+        'is_late',
         'check_in_at',
         'check_out_at',
+        'lunch_started_at',
+        'lunch_ended_at',
     ];
 
     protected function casts(): array
     {
         return [
             'attendance_date' => 'date',
+            'is_late' => 'boolean',
             'check_in_at' => 'datetime',
             'check_out_at' => 'datetime',
+            'lunch_started_at' => 'datetime',
+            'lunch_ended_at' => 'datetime',
         ];
     }
 
