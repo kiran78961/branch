@@ -18,7 +18,7 @@ class SettingsControllerTest extends TestCase
             ->get(route('settings.edit'))
             ->assertOk()
             ->assertSee('Settings')
-            ->assertSee('Profile')
+            ->assertDontSee('profile-settings-heading', false)
             ->assertDontSee('password-settings-heading', false)
             ->assertSee('Appearance')
             ->assertSee('Attendance preferences')
@@ -27,11 +27,42 @@ class SettingsControllerTest extends TestCase
             ->assertSee('action="'.route('logout').'"', false)
             ->assertSee('Sign out')
             ->assertSee('href="'.route('settings.edit').'"', false)
+            ->assertSee('href="'.route('profile.show').'"', false)
             ->assertSee('data-theme-toggle', false)
             ->assertSee('value="13:00"', false)
             ->assertSee('value="14:00"', false)
             ->assertSee('Company workday starts at 10:00 AM')
+            ->assertDontSee('Save profile')
             ->assertDontSee(route('settings.company-attendance.update'));
+    }
+
+    public function test_employee_can_view_and_update_their_profile_page(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Taylor Reed',
+            'email' => 'taylor@example.com',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('profile.show'))
+            ->assertOk()
+            ->assertSee('My Profile')
+            ->assertSee('Employee')
+            ->assertSee('value="Taylor Reed"', false)
+            ->assertSee('value="taylor@example.com"', false)
+            ->assertSee('action="'.route('profile.update').'"', false);
+    }
+
+    public function test_admin_can_view_their_profile_page(): void
+    {
+        $admin = User::factory()->administrator()->create();
+
+        $this->actingAs($admin)
+            ->get(route('profile.show'))
+            ->assertOk()
+            ->assertSee('My Profile')
+            ->assertSee('Administrator')
+            ->assertSee('href="'.route('profile.show').'"', false);
     }
 
     public function test_admin_can_update_the_shared_company_start_time(): void
@@ -96,22 +127,30 @@ class SettingsControllerTest extends TestCase
             ->assertRedirect(route('login'));
     }
 
+    public function test_guest_is_redirected_to_sign_in_from_profile(): void
+    {
+        $this->get(route('profile.show'))
+            ->assertRedirect(route('login'));
+    }
+
     public function test_user_can_update_their_profile(): void
     {
         $user = User::factory()->create();
 
         $this->actingAs($user)
-            ->patch(route('settings.profile.update'), [
+            ->patch(route('profile.update'), [
                 'name' => 'Taylor Reed',
                 'email' => 'taylor@example.com',
+                'is_admin' => true,
             ])
-            ->assertRedirect(route('settings.edit'))
+            ->assertRedirect(route('profile.show'))
             ->assertSessionHas('status', 'Your profile has been updated.');
 
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
             'name' => 'Taylor Reed',
             'email' => 'taylor@example.com',
+            'is_admin' => false,
         ]);
     }
 
@@ -121,12 +160,12 @@ class SettingsControllerTest extends TestCase
         $otherUser = User::factory()->create();
 
         $this->actingAs($user)
-            ->from(route('settings.edit'))
-            ->patch(route('settings.profile.update'), [
+            ->from(route('profile.show'))
+            ->patch(route('profile.update'), [
                 'name' => 'Updated Name',
                 'email' => $otherUser->email,
             ])
-            ->assertRedirect(route('settings.edit'))
+            ->assertRedirect(route('profile.show'))
             ->assertSessionHasErrors('email');
 
         $this->assertDatabaseHas('users', [

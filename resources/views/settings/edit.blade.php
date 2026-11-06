@@ -6,39 +6,10 @@
     <div>
         <p class="text-sm font-medium text-[#748178]">Your account</p>
         <h1 class="mt-2 text-3xl font-semibold tracking-[-0.035em] text-[#18221e] sm:text-4xl">Settings</h1>
-        <p class="mt-3 text-sm leading-6 text-[#748178]">Manage your profile, appearance, and attendance preferences.</p>
+        <p class="mt-3 text-sm leading-6 text-[#748178]">Manage your appearance and attendance preferences.</p>
     </div>
 
     <div class="mt-8 grid gap-5">
-        <section class="rounded-2xl border border-[#e4e9e3] bg-white p-6 shadow-sm sm:p-8" aria-labelledby="profile-settings-heading">
-            <h2 id="profile-settings-heading" class="text-xl font-semibold tracking-tight text-[#18221e]">Profile</h2>
-            <p class="mt-2 text-sm text-[#748178]">Update the name and email address associated with your account.</p>
-
-            <form method="POST" action="{{ route('settings.profile.update') }}" class="mt-6 grid gap-5 sm:grid-cols-2">
-                @csrf
-                @method('PATCH')
-                <div>
-                    <label for="name" class="block text-sm font-medium text-[#303c35]">Name</label>
-                    <input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required maxlength="255" autocomplete="name" class="mt-2 block h-11 w-full rounded-lg border border-[#dce2dc] bg-white px-3 text-sm text-[#18221e] focus:border-[#527863] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">
-                    @error('name')
-                        <p role="alert" class="mt-2 text-sm text-red-700">{{ $message }}</p>
-                    @enderror
-                </div>
-                <div>
-                    <label for="email" class="block text-sm font-medium text-[#303c35]">Email address</label>
-                    <input id="email" name="email" type="email" value="{{ old('email', $user->email) }}" required maxlength="255" autocomplete="email" class="mt-2 block h-11 w-full rounded-lg border border-[#dce2dc] bg-white px-3 text-sm text-[#18221e] focus:border-[#527863] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">
-                    @error('email')
-                        <p role="alert" class="mt-2 text-sm text-red-700">{{ $message }}</p>
-                    @enderror
-                </div>
-                <div class="sm:col-span-2">
-                    <button type="submit" class="inline-flex h-11 items-center justify-center rounded-lg bg-[#173b32] px-5 text-sm font-semibold text-white transition hover:bg-[#294b3b] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">
-                        Save profile
-                    </button>
-                </div>
-            </form>
-        </section>
-
         <section class="rounded-2xl border border-[#e4e9e3] bg-white p-6 shadow-sm sm:p-8" aria-labelledby="appearance-settings-heading">
             <h2 id="appearance-settings-heading" class="text-xl font-semibold tracking-tight text-[#18221e]">Appearance</h2>
             <p class="mt-2 text-sm text-[#748178]">Choose the display theme for this browser. Your choice is saved on this device.</p>

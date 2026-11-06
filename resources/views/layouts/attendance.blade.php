@@ -54,6 +54,14 @@
                     <span class="grid size-5 place-items-center" aria-hidden="true">▦</span>
                     Holidays
                 </a>
+                <a href="{{ route('profile.show') }}" @class([
+                    'inline-flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium transition',
+                    'bg-[#edf5ee] text-[#315d48]' => request()->routeIs('profile.*'),
+                    'text-[#58645c] hover:bg-[#f7f8f5] hover:text-[#294b3b]' => ! request()->routeIs('profile.*'),
+                ]) @if (request()->routeIs('profile.*')) aria-current="page" @endif>
+                    <span class="grid size-5 place-items-center" aria-hidden="true">♙</span>
+                    My Profile
+                </a>
                 <a href="{{ route('settings.edit') }}" @class([
                     'inline-flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium transition',
                     'bg-[#edf5ee] text-[#315d48]' => request()->routeIs('settings.*'),

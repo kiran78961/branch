@@ -10,6 +10,13 @@ use Illuminate\View\View;
 
 class SettingsController extends Controller
 {
+    public function profile(Request $request): View
+    {
+        return view('profile.show', [
+            'user' => $request->user(),
+        ]);
+    }
+
     public function edit(Request $request): View
     {
         $user = $request->user();
@@ -39,7 +46,7 @@ class SettingsController extends Controller
         $user->email = $validated['email'];
         $user->save();
 
-        return redirect()->route('settings.edit')->with('status', 'Your profile has been updated.');
+        return redirect()->route('profile.show')->with('status', 'Your profile has been updated.');
     }
 
     public function updateAttendancePreferences(Request $request): RedirectResponse

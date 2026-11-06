@@ -41,10 +41,13 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
+    Route::get('/profile', [SettingsController::class, 'profile'])
+        ->name('profile.show');
+    Route::patch('/profile', [SettingsController::class, 'updateProfile'])
+        ->name('profile.update');
+
     Route::get('/settings', [SettingsController::class, 'edit'])
         ->name('settings.edit');
-    Route::patch('/settings/profile', [SettingsController::class, 'updateProfile'])
-        ->name('settings.profile.update');
     Route::patch('/settings/attendance', [SettingsController::class, 'updateAttendancePreferences'])
         ->name('settings.attendance.update');
     Route::patch('/settings/company-attendance', [SettingsController::class, 'updateCompanyAttendancePreferences'])
