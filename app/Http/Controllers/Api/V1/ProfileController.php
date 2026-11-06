@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\UpdateUserProfilePicture;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\UserResource;
 use Illuminate\Http\Request;
@@ -25,6 +26,18 @@ class ProfileController extends Controller
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->save();
+
+        return UserResource::make($user->refresh());
+    }
+
+    public function updateAvatar(Request $request, UpdateUserProfilePicture $updateUserProfilePicture): UserResource
+    {
+        $validated = $request->validate([
+            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
+
+        $user = $request->user();
+        $updateUserProfilePicture->handle($user, $validated['avatar']);
 
         return UserResource::make($user->refresh());
     }

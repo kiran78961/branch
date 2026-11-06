@@ -6,9 +6,20 @@
     <div class="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div>
             <a href="{{ route('admin.staff.index') }}" class="text-sm font-semibold text-[#527863] transition hover:text-[#294b3b]">← Back to staff</a>
-            <p class="mt-6 text-sm font-medium text-[#748178]">Employee profile</p>
-            <h1 class="mt-2 text-3xl font-semibold tracking-[-0.035em] text-[#18221e] sm:text-4xl">{{ $staffMember->name }}</h1>
-            <p class="mt-2 text-sm leading-6 text-[#748178]">{{ $staffMember->email }}</p>
+            <div class="mt-6 flex items-center gap-4">
+                @if ($staffMember->avatar_path)
+                    <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($staffMember->avatar_path) }}" alt="{{ $staffMember->name }} profile picture" class="size-16 rounded-full object-cover">
+                @else
+                    <div aria-label="No profile picture uploaded" class="flex size-16 items-center justify-center rounded-full bg-[#edf5ee] text-xl font-semibold text-[#315d48]">
+                        {{ mb_strtoupper(mb_substr($staffMember->name, 0, 1)) }}
+                    </div>
+                @endif
+                <div>
+                    <p class="text-sm font-medium text-[#748178]">Employee profile</p>
+                    <h1 class="mt-2 text-3xl font-semibold tracking-[-0.035em] text-[#18221e] sm:text-4xl">{{ $staffMember->name }}</h1>
+                    <p class="mt-2 text-sm leading-6 text-[#748178]">{{ $staffMember->email }}</p>
+                </div>
+            </div>
         </div>
         @if (! $staffMember->is(auth()->user()))
             <form method="POST" action="{{ route('admin.staff.role', $staffMember) }}">

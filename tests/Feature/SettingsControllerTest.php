@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class SettingsControllerTest extends TestCase
@@ -152,6 +154,88 @@ class SettingsControllerTest extends TestCase
             'email' => 'taylor@example.com',
             'is_admin' => false,
         ]);
+    }
+
+    public function test_employee_and_admin_can_upload_profile_pictures(): void
+    {
+        Storage::fake('public');
+
+        $users = [
+            User::factory()->create(),
+            User::factory()->administrator()->create(),
+        ];
+
+        foreach ($users as $user) {
+            $this->actingAs($user)
+                ->patch(route('profile.update'), [
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'avatar' => UploadedFile::fake()->create('profile.jpg', 10, 'image/jpeg'),
+                ])
+                ->assertRedirect(route('profile.show'));
+
+            $avatarPath = $user->fresh()->avatar_path;
+
+            $this->assertNotNull($avatarPath);
+            Storage::disk('public')->assertExists($avatarPath);
+            $this->get(route('profile.show'))
+                ->assertOk()
+                ->assertSee(Storage::disk('public')->url($avatarPath), false);
+        }
+    }
+
+    public function test_replacing_a_profile_picture_removes_the_previous_file(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create();
+        $oldAvatarPath = "profile-pictures/{$user->id}/existing.jpg";
+        Storage::disk('public')->put($oldAvatarPath, 'existing image');
+        $user->avatar_path = $oldAvatarPath;
+        $user->save();
+
+        $this->actingAs($user)
+            ->patch(route('profile.update'), [
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar' => UploadedFile::fake()->create('new-profile.jpg', 10, 'image/jpeg'),
+            ])
+            ->assertRedirect(route('profile.show'));
+
+        $newAvatarPath = $user->fresh()->avatar_path;
+
+        $this->assertNotSame($oldAvatarPath, $newAvatarPath);
+        Storage::disk('public')->assertMissing($oldAvatarPath);
+        Storage::disk('public')->assertExists($newAvatarPath);
+    }
+
+    public function test_profile_picture_upload_rejects_non_image_files_without_changing_profile(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create();
+        $oldAvatarPath = "profile-pictures/{$user->id}/existing.jpg";
+        Storage::disk('public')->put($oldAvatarPath, 'existing image');
+        $user->avatar_path = $oldAvatarPath;
+        $user->save();
+
+        $this->actingAs($user)
+            ->from(route('profile.show'))
+            ->patch(route('profile.update'), [
+                'name' => 'Changed Name',
+                'email' => $user->email,
+                'avatar' => UploadedFile::fake()->create('avatar.svg', 2, 'image/svg+xml'),
+            ])
+            ->assertRedirect(route('profile.show'))
+            ->assertSessionHasErrors('avatar');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => $user->name,
+            'avatar_path' => $oldAvatarPath,
+        ]);
+        Storage::disk('public')->assertExists($oldAvatarPath);
+        $this->assertCount(1, Storage::disk('public')->allFiles());
     }
 
     public function test_user_cannot_change_profile_to_an_existing_email(): void

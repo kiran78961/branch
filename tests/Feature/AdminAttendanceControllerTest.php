@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AdminAttendanceControllerTest extends TestCase
@@ -293,6 +294,23 @@ class AdminAttendanceControllerTest extends TestCase
             ->assertSee('Taylor Worker')
             ->assertSee('Nov 4, 2026')
             ->assertViewHas('attendances', fn ($attendances): bool => $attendances->total() === 1);
+    }
+
+    public function test_admin_can_view_an_employees_profile_picture(): void
+    {
+        Storage::fake('public');
+
+        $admin = User::factory()->administrator()->create();
+        $employee = User::factory()->create();
+        $avatarPath = "profile-pictures/{$employee->id}/profile.jpg";
+        Storage::disk('public')->put($avatarPath, 'profile picture');
+        $employee->avatar_path = $avatarPath;
+        $employee->save();
+
+        $this->actingAs($admin)
+            ->get(route('admin.staff.show', $employee))
+            ->assertOk()
+            ->assertSee(Storage::disk('public')->url($avatarPath), false);
     }
 
     public function test_admin_cannot_create_an_employee_with_invalid_credentials(): void

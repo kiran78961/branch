@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\UpdateUserProfilePicture;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,13 +35,18 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function updateProfile(Request $request): RedirectResponse
+    public function updateProfile(Request $request, UpdateUserProfilePicture $updateUserProfilePicture): RedirectResponse
     {
         $user = $request->user();
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user)],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
+
+        if (isset($validated['avatar'])) {
+            $updateUserProfilePicture->handle($user, $validated['avatar']);
+        }
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];

@@ -20,9 +20,26 @@
             </span>
         </div>
 
-        <form method="POST" action="{{ route('profile.update') }}" class="mt-6 grid gap-5 sm:grid-cols-2">
+        <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="mt-6 grid gap-5 sm:grid-cols-2">
             @csrf
             @method('PATCH')
+            <div class="flex items-center gap-4 sm:col-span-2">
+                @if ($user->avatar_path)
+                    <img src="{{ Illuminate\Support\Facades\Storage::disk('public')->url($user->avatar_path) }}" alt="{{ $user->name }} profile picture" class="size-20 rounded-full object-cover">
+                @else
+                    <div aria-label="No profile picture uploaded" class="flex size-20 items-center justify-center rounded-full bg-[#edf5ee] text-2xl font-semibold text-[#315d48]">
+                        {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
+                    </div>
+                @endif
+                <div>
+                    <label for="avatar" class="block text-sm font-medium text-[#303c35]">Profile picture</label>
+                    <input id="avatar" name="avatar" type="file" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full text-sm text-[#58645c] file:mr-3 file:rounded-lg file:border-0 file:bg-[#edf5ee] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-[#315d48]">
+                    <p class="mt-1 text-xs text-[#748178]">JPG, PNG, or WebP up to 2 MB.</p>
+                    @error('avatar')
+                        <p role="alert" class="mt-2 text-sm text-red-700">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
             <div>
                 <label for="name" class="block text-sm font-medium text-[#303c35]">Name</label>
                 <input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required maxlength="255" autocomplete="name" class="mt-2 block h-11 w-full rounded-lg border border-[#dce2dc] bg-white px-3 text-sm text-[#18221e] focus:border-[#527863] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">

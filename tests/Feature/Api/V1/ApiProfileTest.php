@@ -4,6 +4,8 @@ namespace Tests\Feature\Api\V1;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ApiProfileTest extends TestCase
@@ -50,8 +52,35 @@ class ApiProfileTest extends TestCase
             ->assertJsonPath('data.role', 'admin');
     }
 
+    public function test_authenticated_user_can_upload_a_profile_picture(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->post('/api/v1/profile/avatar', [
+                'avatar' => UploadedFile::fake()->create('profile.jpg', 10, 'image/jpeg'),
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.id', $user->id)
+            ->assertJsonPath('data.avatar_url', Storage::disk('public')->url($user->fresh()->avatar_path));
+
+        Storage::disk('public')->assertExists($user->fresh()->avatar_path);
+    }
+
     public function test_guest_cannot_view_a_profile(): void
     {
         $this->getJson('/api/v1/profile')->assertUnauthorized();
+    }
+
+    public function test_guest_cannot_upload_a_profile_picture(): void
+    {
+        Storage::fake('public');
+
+        $this->postJson('/api/v1/profile/avatar', [
+            'avatar' => UploadedFile::fake()->create('profile.jpg', 10, 'image/jpeg'),
+        ])->assertUnauthorized();
+
+        $this->assertSame([], Storage::disk('public')->allFiles());
     }
 }
