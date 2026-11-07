@@ -21,11 +21,12 @@
 
     <div class="mt-8 overflow-hidden rounded-2xl border border-[#e4e9e3] bg-white shadow-sm">
         <div class="overflow-x-auto">
-            <table class="w-full min-w-[680px] text-left text-sm">
+            <table class="w-full min-w-[820px] text-left text-sm">
                 <thead class="bg-[#f7f8f5] text-xs font-semibold uppercase tracking-wide text-[#748178]">
                     <tr>
                         <th scope="col" class="px-5 py-4">Staff member</th>
                         <th scope="col" class="px-5 py-4">Role</th>
+                        <th scope="col" class="px-5 py-4">Monthly salary</th>
                         <th scope="col" class="px-5 py-4">Access</th>
                     </tr>
                 </thead>
@@ -37,6 +38,16 @@
                                 <p class="mt-1 text-xs text-[#748178]">{{ $staffMember->email }}</p>
                             </td>
                             <td class="px-5 py-4 text-[#58645c]">{{ $staffMember->is_admin ? 'Administrator' : 'Employee' }}</td>
+                            <td class="whitespace-nowrap px-5 py-4">
+                                @if ($staffMember->monthly_salary === null)
+                                    <span class="text-[#748178]">Not set</span>
+                                @else
+                                    <span class="text-[#303c35]">₹{{ number_format((float) $staffMember->monthly_salary, 2) }}</span>
+                                @endif
+                                <a href="{{ route('admin.staff.show', $staffMember) }}#employee-salary" class="ml-3 font-semibold text-[#315d48] transition hover:text-[#173b32] hover:underline">
+                                    {{ $staffMember->monthly_salary === null ? 'Set salary' : 'Edit salary' }}
+                                </a>
+                            </td>
                             <td class="px-5 py-4">
                                 @if (! $staffMember->is(auth()->user()))
                                     <form method="POST" action="{{ route('admin.staff.role', $staffMember) }}">
@@ -54,7 +65,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-5 py-10 text-center text-sm text-[#748178]">No staff accounts are registered yet.</td>
+                            <td colspan="4" class="px-5 py-10 text-center text-sm text-[#748178]">No staff accounts are registered yet.</td>
                         </tr>
                     @endforelse
                 </tbody>

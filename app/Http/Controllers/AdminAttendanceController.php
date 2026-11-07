@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\RecordSalaryChange;
 use App\Models\Attendance;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -189,6 +191,10 @@ class AdminAttendanceController extends Controller
                 ->orderByDesc('attendance_date')
                 ->orderByDesc('id')
                 ->paginate(15),
+            'salaryHistories' => $user->salaryHistories()
+                ->with('changedBy:id,name')
+                ->paginate(15, ['*'], 'salary_history_page')
+                ->withQueryString(),
         ]);
     }
 
@@ -197,22 +203,41 @@ class AdminAttendanceController extends Controller
         return view('admin.staff.create');
     }
 
-    public function storeStaff(Request $request): RedirectResponse
+    public function storeStaff(Request $request, RecordSalaryChange $recordSalaryChange): RedirectResponse
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'monthly_salary' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999999.99'],
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password'],
-        ]);
+        $user = DB::transaction(function () use ($validated, $request, $recordSalaryChange): User {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password'],
+            ]);
+
+            $recordSalaryChange->handle($user, $validated['monthly_salary'], $request->user());
+
+            return $user->refresh();
+        });
 
         return redirect()->route('admin.staff.show', $user)
             ->with('status', 'Employee created. Share the temporary password with them securely.');
+    }
+
+    public function updateSalary(Request $request, User $user, RecordSalaryChange $recordSalaryChange): RedirectResponse
+    {
+        $validated = $request->validate([
+            'monthly_salary' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999999.99'],
+        ]);
+
+        $recordSalaryChange->handle($user, $validated['monthly_salary'], $request->user());
+
+        return redirect()->route('admin.staff.show', $user)
+            ->with('status', 'Employee monthly salary has been updated.');
     }
 
     public function updateRole(Request $request, User $user): RedirectResponse

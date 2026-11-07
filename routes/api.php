@@ -73,6 +73,8 @@ Route::prefix('v1')
                     ->name('staff.show');
                 Route::patch('/staff/{user}/role', [AdminStaffController::class, 'updateRole'])
                     ->name('staff.role');
+                Route::patch('/staff/{user}/salary', [AdminStaffController::class, 'updateSalary'])
+                    ->name('staff.salary');
                 Route::get('/leave-requests', [AdminLeaveRequestController::class, 'index'])
                     ->name('leave-requests.index');
                 Route::patch('/leave-requests/{leaveRequest}', [AdminLeaveRequestController::class, 'update'])

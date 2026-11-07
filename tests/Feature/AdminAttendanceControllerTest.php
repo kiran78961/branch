@@ -251,6 +251,25 @@ class AdminAttendanceControllerTest extends TestCase
             ->assertDontSee('<script>alert(1)</script>', false);
     }
 
+    public function test_admin_can_set_or_edit_salary_for_existing_staff_from_the_staff_list(): void
+    {
+        $admin = User::factory()->administrator()->create();
+        $employeeWithoutSalary = User::factory()->create();
+        $employeeWithSalary = User::factory()->create([
+            'monthly_salary' => '65000.00',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.staff.index'))
+            ->assertOk()
+            ->assertSee('Not set')
+            ->assertSee('Set salary')
+            ->assertSee('₹65,000.00')
+            ->assertSee('Edit salary')
+            ->assertSee(route('admin.staff.show', $employeeWithoutSalary).'#employee-salary')
+            ->assertSee(route('admin.staff.show', $employeeWithSalary).'#employee-salary');
+    }
+
     public function test_admin_can_create_an_employee_with_a_temporary_password(): void
     {
         $admin = User::factory()->administrator()->create();
@@ -265,6 +284,7 @@ class AdminAttendanceControllerTest extends TestCase
             'email' => 'jamie@example.com',
             'password' => 'temporary-password',
             'password_confirmation' => 'temporary-password',
+            'monthly_salary' => '65000.00',
             'is_admin' => true,
         ]);
 
@@ -276,6 +296,13 @@ class AdminAttendanceControllerTest extends TestCase
             'name' => 'Jamie Employee',
             'email' => 'jamie@example.com',
             'is_admin' => false,
+            'monthly_salary' => '65000.00',
+        ]);
+        $this->assertDatabaseHas('salary_histories', [
+            'user_id' => $employee->id,
+            'changed_by' => $admin->id,
+            'monthly_salary' => '65000.00',
+            'change_type' => 'assigned',
         ]);
         $this->assertTrue(Hash::check('temporary-password', $employee->password));
     }

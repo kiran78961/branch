@@ -48,6 +48,29 @@
         </div>
     </section>
 
+    <section id="employee-salary" class="mt-8 max-w-2xl rounded-2xl border border-[#e4e9e3] bg-white p-6 shadow-sm sm:p-8" aria-labelledby="employee-salary-title">
+        <h2 id="employee-salary-title" class="text-xl font-semibold tracking-tight text-[#18221e]">Monthly salary</h2>
+        <p class="mt-1 text-sm text-[#748178]">Set the fixed monthly salary used on this employee's salary slip.</p>
+
+        @if ($errors->has('monthly_salary'))
+            <div role="alert" class="mt-4 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-800">
+                {{ $errors->first('monthly_salary') }}
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('admin.staff.salary', $staffMember) }}" class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end">
+            @csrf
+            @method('PATCH')
+            <div class="flex-1 space-y-2">
+                <label for="monthly_salary" class="block text-sm font-medium text-[#303c35]">Monthly salary (INR)</label>
+                <input id="monthly_salary" name="monthly_salary" type="number" value="{{ old('monthly_salary', $staffMember->monthly_salary) }}" min="0" max="9999999999.99" step="0.01" inputmode="decimal" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
+            </div>
+            <button type="submit" class="flex h-12 items-center justify-center rounded-lg bg-[#244b3b] px-5 text-sm font-semibold text-white transition hover:bg-[#193d30] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">Save salary</button>
+        </form>
+    </section>
+
+    @include('salary-history.list', ['salaryHistories' => $salaryHistories])
+
     <section class="mt-9" aria-labelledby="employee-attendance-title">
         <div>
             <h2 id="employee-attendance-title" class="text-xl font-semibold tracking-tight text-[#18221e]">Attendance history</h2>

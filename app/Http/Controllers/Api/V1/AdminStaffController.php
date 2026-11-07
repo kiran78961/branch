@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Actions\RecordSalaryChange;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\AttendanceResource;
 use App\Http\Resources\Api\V1\UserResource;
@@ -69,5 +70,22 @@ class AdminStaffController extends Controller
         $user->save();
 
         return UserResource::make($user->refresh())->response();
+    }
+
+    public function updateSalary(Request $request, User $user, RecordSalaryChange $recordSalaryChange): JsonResponse
+    {
+        $validated = $request->validate([
+            'monthly_salary' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999999.99'],
+        ]);
+
+        $recordSalaryChange->handle($user, $validated['monthly_salary'], $request->user());
+        $user->refresh();
+
+        return response()->json([
+            'data' => [
+                'id' => $user->id,
+                'monthly_salary' => $user->monthly_salary,
+            ],
+        ]);
     }
 }

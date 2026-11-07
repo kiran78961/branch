@@ -7,6 +7,7 @@ use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\SalarySlipController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -60,6 +61,12 @@ Route::middleware('auth')->group(function () {
         ->name('attendance.history');
     Route::get('/holidays', [HolidayController::class, 'index'])
         ->name('holidays.index');
+    Route::get('/salary-slip', [SalarySlipController::class, 'show'])
+        ->name('salary-slip.show');
+    Route::post('/salary-notifications/{notification}/read', [SalarySlipController::class, 'markAsRead'])
+        ->name('salary-notifications.read');
+    Route::get('/salary-slip/download', [SalarySlipController::class, 'download'])
+        ->name('salary-slip.download');
     Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn'])
         ->name('attendance.check-in');
     Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut'])
@@ -95,5 +102,7 @@ Route::middleware('auth')->group(function () {
                 ->name('staff.index');
             Route::patch('/staff/{user}/role', [AdminAttendanceController::class, 'updateRole'])
                 ->name('staff.role');
+            Route::patch('/staff/{user}/salary', [AdminAttendanceController::class, 'updateSalary'])
+                ->name('staff.salary');
         });
 });

@@ -9,11 +9,11 @@
 </head>
 <body class="min-h-screen bg-[#f7f8f5] text-[#18221e] antialiased">
     <main class="grid min-h-screen lg:grid-cols-[1.05fr_0.95fr]">
-        <section class="relative isolate flex min-h-[420px] flex-col overflow-hidden bg-[#173b32] px-8 py-8 text-white sm:px-12 lg:min-h-screen lg:px-16 lg:py-12" aria-label="About Branch">
+        <section class="branch-card-enter relative isolate flex min-h-[420px] flex-col overflow-hidden bg-[#173b32] px-8 py-8 text-white sm:px-12 lg:min-h-screen lg:px-20 lg:py-14" aria-label="About Branch">
             <div class="absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
                 <div class="absolute -left-36 top-24 size-[28rem] rounded-full bg-[#9abf8e]/15 blur-3xl"></div>
                 <div class="absolute -bottom-48 right-[-4rem] size-[34rem] rounded-full bg-[#d49d68]/15 blur-3xl"></div>
-                <svg class="absolute -bottom-8 right-[-2rem] h-[28rem] w-[28rem] opacity-30 sm:right-0" viewBox="0 0 460 460" fill="none">
+                <svg class="absolute -bottom-8 right-[-2rem] h-[28rem] w-[28rem] opacity-20 sm:right-0" viewBox="0 0 460 460" fill="none">
                     <path d="M92 427C173 329 222 224 279 28M171 315c-57-6-88-39-95-91 51 3 84 34 95 91ZM213 235c-4-55 22-95 73-119 9 50-16 91-73 119ZM270 117c-46-27-64-70-53-121 46 22 66 64 53 121ZM123 376c-48-20-70-60-64-112 47 16 72 56 64 112ZM231 182c-49-20-71-60-65-111 48 16 72 55 65 111Z" stroke="white" stroke-width="2"/>
                     <circle cx="279" cy="28" r="5" fill="#d49d68"/>
                 </svg>
@@ -39,15 +39,15 @@
                 <span class="text-xl font-semibold tracking-tight">branch</span>
             </a>
 
-            <div class="relative my-auto max-w-xl py-16 lg:py-24">
-                <p class="mb-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#c5d6c6]">
+            <div class="relative my-auto max-w-lg py-16 lg:py-24">
+                <p class="mb-6 flex items-center gap-3 text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#c5d6c6]">
                     <span class="h-px w-8 bg-[#d49d68]"></span>
                     A calmer way to work
                 </p>
-                <h1 class="max-w-lg text-4xl font-medium leading-[1.12] tracking-[-0.04em] sm:text-5xl lg:text-6xl">
+                <h1 class="max-w-md text-4xl font-medium leading-[1.08] tracking-[-0.045em] sm:text-5xl lg:text-[3.75rem]">
                     Make room for your best work.
                 </h1>
-                <p class="mt-6 max-w-md text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
+                <p class="mt-6 max-w-sm text-base leading-7 text-white/70 sm:text-lg sm:leading-8">
                     Bring your people and projects together, and let the good work grow from there.
                 </p>
             </div>
@@ -55,23 +55,11 @@
             <p class="relative text-xs text-white/45">Thoughtful work starts here.</p>
         </section>
 
-        <section class="flex items-center justify-center px-6 py-14 sm:px-10 lg:px-14" aria-labelledby="login-title">
-            <div class="w-full max-w-[420px]">
-                <div class="mb-10 lg:hidden">
-                    <a href="/" class="inline-flex items-center gap-3 text-[#173b32] no-underline" aria-label="Branch home">
-                        <span class="grid size-10 place-items-center rounded-xl bg-[#173b32] text-white">
-                            <svg class="size-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                <path d="M6 19V9m0 5 5-5m-5 5-3-3m9 9V5m0 8 6-6m-6 6 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                <circle cx="12" cy="5" r="1.5" fill="#d49d68"/>
-                            </svg>
-                        </span>
-                        <span class="text-xl font-semibold tracking-tight">branch</span>
-                    </a>
-                </div>
-
+        <section class="branch-card-enter branch-card-enter--delayed flex items-center justify-center bg-[#fbfcfa] px-5 py-10 sm:px-10 sm:py-14 lg:px-14" aria-labelledby="login-title">
+            <div class="w-full max-w-[460px] rounded-3xl border border-[#edf0ec] bg-white p-7 shadow-[0_24px_70px_-36px_rgba(23,59,50,0.22)] sm:p-10 lg:p-11">
                 <div class="mb-9">
                     <p class="mb-3 text-sm font-medium text-[#748178]">Welcome back</p>
-                    <h2 id="login-title" class="text-3xl font-semibold tracking-[-0.035em] text-[#18221e] sm:text-[2.1rem]">Sign in to Branch</h2>
+                    <h2 id="login-title" class="text-3xl font-semibold tracking-[-0.045em] text-[#18221e] sm:text-[2.15rem]">Sign in to Branch</h2>
                     <p class="mt-3 text-sm leading-6 text-[#748178]">Enter your details to pick up where you left off.</p>
                 </div>
 
@@ -94,17 +82,17 @@
                         </div>
                     @endif
 
-                    <div class="space-y-2">
+                    <div class="space-y-2.5">
                         <label for="email" class="block text-sm font-medium text-[#303c35]">Work email</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" placeholder="you@company.com" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" placeholder="you@company.com" required class="h-13 w-full rounded-xl border border-[#e2e8e2] bg-[#fafbf9] px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#b8c5ba] focus:border-[#527863] focus:bg-white focus:ring-4 focus:ring-[#527863]/10">
                     </div>
 
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between gap-4">
+                    <div class="space-y-2.5">
+                        <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                             <label for="password" class="block text-sm font-medium text-[#303c35]">Password</label>
-                            <span class="text-sm text-[#98a199]">Forgot password? Contact your administrator.</span>
+                            <span class="text-xs leading-5 text-[#98a199]">Forgot password? Contact your administrator.</span>
                         </div>
-                        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
+                        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required class="h-13 w-full rounded-xl border border-[#e2e8e2] bg-[#fafbf9] px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#b8c5ba] focus:border-[#527863] focus:bg-white focus:ring-4 focus:ring-[#527863]/10">
                     </div>
 
                     <label class="flex w-fit cursor-pointer items-center gap-3 py-1 text-sm text-[#58645c]">
@@ -112,9 +100,9 @@
                         Keep me signed in
                     </label>
 
-                    <button type="submit" class="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#244b3b] px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#193d30] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">
+                    <button type="submit" class="group mt-2 flex h-13 w-full items-center justify-center gap-2 rounded-xl bg-[#244b3b] px-5 text-sm font-semibold text-white shadow-[0_8px_20px_-10px_rgba(36,75,59,0.65)] transition hover:-translate-y-0.5 hover:bg-[#193d30] hover:shadow-[0_12px_24px_-12px_rgba(36,75,59,0.7)] focus:outline-none focus:ring-4 focus:ring-[#527863]/20">
                         Sign in
-                        <svg class="size-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                        <svg class="size-4 motion-safe:transition-transform motion-safe:group-hover:translate-x-1" viewBox="0 0 20 20" fill="none" aria-hidden="true">
                             <path d="M4 10h12m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>

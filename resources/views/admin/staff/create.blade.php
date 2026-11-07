@@ -33,6 +33,11 @@
             <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" maxlength="255" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
         </div>
 
+        <div class="space-y-2">
+            <label for="monthly_salary" class="block text-sm font-medium text-[#303c35]">Monthly salary (INR)</label>
+            <input id="monthly_salary" name="monthly_salary" type="number" value="{{ old('monthly_salary') }}" min="0" max="9999999999.99" step="0.01" inputmode="decimal" required class="h-12 w-full rounded-lg border border-[#dce2dc] bg-white px-4 text-sm text-[#18221e] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#aab8ac] focus:border-[#527863] focus:ring-4 focus:ring-[#527863]/10">
+        </div>
+
         <div class="grid gap-5 sm:grid-cols-2">
             <div class="space-y-2">
                 <label for="password" class="block text-sm font-medium text-[#303c35]">Temporary password</label>

@@ -46,6 +46,14 @@
                     <span class="grid size-5 place-items-center" aria-hidden="true">▤</span>
                     Attendance history
                 </a>
+                <a href="{{ route('salary-slip.show') }}" @class([
+                    'inline-flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium transition',
+                    'bg-[#edf5ee] text-[#315d48]' => request()->routeIs('salary-slip.*'),
+                    'text-[#58645c] hover:bg-[#f7f8f5] hover:text-[#294b3b]' => ! request()->routeIs('salary-slip.*'),
+                ]) @if (request()->routeIs('salary-slip.*')) aria-current="page" @endif>
+                    <span class="grid size-5 place-items-center" aria-hidden="true">₹</span>
+                    Salary slip
+                </a>
                 <a href="{{ route('holidays.index') }}" @class([
                     'inline-flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium transition',
                     'bg-[#edf5ee] text-[#315d48]' => request()->routeIs('holidays.*'),

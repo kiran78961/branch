@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'lunch_start_time', 'lunch_end_time', 'daily_work_hours'])]
+#[Fillable(['name', 'email', 'password', 'lunch_start_time', 'lunch_end_time', 'daily_work_hours', 'monthly_salary'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -32,6 +32,7 @@ class User extends Authenticatable
         return [
             'is_admin' => 'boolean',
             'password' => 'hashed',
+            'monthly_salary' => 'decimal:2',
         ];
     }
 
@@ -48,5 +49,10 @@ class User extends Authenticatable
     public function reviewedLeaveRequests(): HasMany
     {
         return $this->hasMany(LeaveRequest::class, 'reviewed_by');
+    }
+
+    public function salaryHistories(): HasMany
+    {
+        return $this->hasMany(SalaryHistory::class)->latest('changed_at')->latest('id');
     }
 }

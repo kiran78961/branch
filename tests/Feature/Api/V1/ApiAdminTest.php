@@ -4,6 +4,7 @@ namespace Tests\Feature\Api\V1;
 
 use App\Models\Attendance;
 use App\Models\User;
+use App\Notifications\SalaryChangedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -43,6 +44,83 @@ class ApiAdminTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $employeeId,
             'is_admin' => true,
+        ]);
+    }
+
+    public function test_admin_can_assign_an_employees_monthly_salary(): void
+    {
+        $admin = User::factory()->administrator()->create();
+        $employee = User::factory()->create();
+
+        $this->actingAs($admin)
+            ->patchJson("/api/v1/admin/staff/{$employee->id}/salary", [
+                'monthly_salary' => '68000.50',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.id', $employee->id)
+            ->assertJsonPath('data.monthly_salary', '68000.50');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $employee->id,
+            'monthly_salary' => '68000.50',
+        ]);
+        $this->assertDatabaseHas('salary_histories', [
+            'user_id' => $employee->id,
+            'changed_by' => $admin->id,
+            'monthly_salary' => '68000.50',
+            'change_type' => 'assigned',
+        ]);
+
+        $notification = $employee->notifications()->firstOrFail();
+        $this->assertSame(SalaryChangedNotification::class, $notification->type);
+        $this->assertArrayNotHasKey('monthly_salary', $notification->data);
+    }
+
+    public function test_monthly_salary_assignment_requires_authentication(): void
+    {
+        $employee = User::factory()->create();
+
+        $this->patchJson("/api/v1/admin/staff/{$employee->id}/salary", [
+            'monthly_salary' => '68000.50',
+        ])->assertUnauthorized();
+    }
+
+    public function test_employee_is_forbidden_from_assigning_an_employees_monthly_salary(): void
+    {
+        $employee = User::factory()->create();
+        $coworker = User::factory()->create([
+            'monthly_salary' => '50000.00',
+        ]);
+
+        $this->actingAs($employee)
+            ->patchJson("/api/v1/admin/staff/{$coworker->id}/salary", [
+                'monthly_salary' => '1.00',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('users', [
+            'id' => $coworker->id,
+            'monthly_salary' => '50000.00',
+        ]);
+    }
+
+    public function test_admin_cannot_assign_a_negative_monthly_salary(): void
+    {
+        $admin = User::factory()->administrator()->create();
+        $employee = User::factory()->create([
+            'monthly_salary' => '50000.00',
+        ]);
+
+        $this->actingAs($admin)
+            ->patchJson("/api/v1/admin/staff/{$employee->id}/salary", [
+                'monthly_salary' => '-1.00',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('monthly_salary');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $employee->id,
+            'monthly_salary' => '50000.00',
         ]);
     }
 
